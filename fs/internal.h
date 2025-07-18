@@ -42,7 +42,7 @@ static inline int __sync_blockdev(struct block_device *bdev, int wait)
  */
 extern void guard_bio_eod(int rw, struct bio *bio);
 extern int __block_write_begin_int(struct page *page, loff_t pos, unsigned len,
-		get_block_t *get_block, struct iomap *iomap);
+								   get_block_t *get_block, struct iomap *iomap);
 
 /*
  * char_dev.c
@@ -54,7 +54,7 @@ extern void __init chrdev_init(void);
  */
 extern int user_path_mountpoint_at(int, const char __user *, unsigned int, struct path *);
 extern int vfs_path_lookup(struct dentry *, struct vfsmount *,
-			   const char *, unsigned int, struct path *);
+						   const char *, unsigned int, struct path *);
 
 /*
  * namespace.c
@@ -68,6 +68,7 @@ extern int finish_automount(struct vfsmount *, struct path *);
 extern int sb_prepare_remount_readonly(struct super_block *);
 
 extern void __init mnt_init(void);
+int path_umount(struct path *path, int flags);
 
 extern int __mnt_want_write(struct vfsmount *);
 extern int __mnt_want_write_file(struct file *);
@@ -91,16 +92,17 @@ extern struct file *get_empty_filp(void);
  */
 extern int do_remount_sb(struct super_block *, int, void *, int);
 extern int do_remount_sb2(struct vfsmount *, struct super_block *, int,
-								void *, int);
+						  void *, int);
 extern bool trylock_super(struct super_block *sb);
 extern struct dentry *mount_fs(struct file_system_type *,
-			       int, const char *, struct vfsmount *, void *);
+							   int, const char *, struct vfsmount *, void *);
 extern struct super_block *user_get_super(dev_t);
 
 /*
  * open.c
  */
-struct open_flags {
+struct open_flags
+{
 	int open_flag;
 	umode_t mode;
 	int acc_mode;
@@ -108,9 +110,9 @@ struct open_flags {
 	int lookup_flags;
 };
 extern struct file *do_filp_open(int dfd, struct filename *pathname,
-		const struct open_flags *op);
+								 const struct open_flags *op);
 extern struct file *do_file_open_root(struct dentry *, struct vfsmount *,
-		const char *, const struct open_flags *);
+									  const char *, const struct open_flags *);
 
 extern int open_check_o_direct(struct file *f);
 extern int vfs_open(const struct path *, struct file *, const struct cred *);
@@ -125,7 +127,7 @@ extern int dentry_needs_remove_privs(struct dentry *dentry);
 
 extern bool __atime_needs_update(const struct path *, struct inode *, bool);
 static inline bool atime_needs_update_rcu(const struct path *path,
-					  struct inode *inode)
+										  struct inode *inode)
 {
 	return __atime_needs_update(path, inode, true);
 }
@@ -171,18 +173,18 @@ extern const struct dentry_operations ns_dentry_operations;
  * fs/ioctl.c
  */
 extern int do_vfs_ioctl(struct file *file, unsigned int fd, unsigned int cmd,
-		    unsigned long arg);
+						unsigned long arg);
 extern long vfs_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
 
 /*
  * iomap support:
  */
 typedef loff_t (*iomap_actor_t)(struct inode *inode, loff_t pos, loff_t len,
-		void *data, struct iomap *iomap);
+								void *data, struct iomap *iomap);
 
 loff_t iomap_apply(struct inode *inode, loff_t pos, loff_t length,
-		unsigned flags, const struct iomap_ops *ops, void *data,
-		iomap_actor_t actor);
+				   unsigned flags, const struct iomap_ops *ops, void *data,
+				   iomap_actor_t actor);
 
 /* direct-io.c: */
 int sb_init_dio_done_wq(struct super_block *sb);
